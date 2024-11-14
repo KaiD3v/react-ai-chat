@@ -2,6 +2,7 @@ import { LlamaAI as ai } from "llamaai";
 import { useState } from "react";
 import { Container } from "./components/container";
 import { Chat } from "./components/chat";
+import { MessageInput } from "./components/message-input";
 
 // interface Choice {
 //   finish_reason: string;
@@ -48,16 +49,7 @@ function App() {
     <Container>
       <main className="flex flex-col justify-between h-full">
         <Chat className="mt-5 max-h-[calc(100vh-100px)]" />
-        <div className="flex gap-3 mb-10">
-          <input
-            className="w-full py-3 rounded border px-1"
-            type="text"
-            placeholder="Digite um texto..."
-          />
-          <button className="bg-blue-500 text-white px-4 border rounded">
-            Send
-          </button>
-        </div>
+        <MessageInput />
       </main>
     </Container>
   );
