@@ -23,7 +23,7 @@ interface MessageHistory {
 export function Chat({ className }: { className: string }) {
   const [messageHistory, setMessageHistory] = useState<MessageHistory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [prevMessage, setPrevMessage] = useState("");
+  const [prevMessage, setPrevMessage]: any = useState("");
   const { message } = useContext(MessageContext);
   const llamaAPI = new ai(apiToken);
 
