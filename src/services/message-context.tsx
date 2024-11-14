@@ -2,10 +2,10 @@ import React, { createContext, useState } from "react";
 
 interface MessageProps {
   message: string | null;
-  setMessage: React.Dispatch<React.SetStateAction<string>> | null;
+  setMessage: React.Dispatch<React.SetStateAction<string>>
 }
 
-const MessageContext = createContext<MessageProps>({
+export const MessageContext = createContext<MessageProps>({
   message: "",
   setMessage: () => {},
 });

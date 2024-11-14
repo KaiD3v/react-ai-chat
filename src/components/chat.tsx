@@ -2,7 +2,8 @@
 
 import { LlamaAI as ai } from "llamaai";
 import { apiToken } from "../utils/api-token";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { MessageContext } from "../services/message-context";
 
 interface Choice {
   finish_reason: string;
@@ -16,22 +17,17 @@ interface LlamaResponse {
   choices: Choice[];
 }
 
-export function Chat({
-  className,
-  askText,
-}: {
-  className: string;
-  askText?: string;
-}) {
+export function Chat({ className }: { className: string }) {
   const [response, setResponse] = useState("");
-  const ask = askText;
+  const [messageHistory, setMessageHistory] = useState([""]);
+  const { message } = useContext(MessageContext);
   const llamaAPI = new ai(apiToken);
 
   const apiRequest = {
     messages: [
       {
         role: "user",
-        content: askText,
+        content: message === "" ? "Olá!" : message,
       },
     ],
   };
@@ -40,16 +36,19 @@ export function Chat({
     const fetchResponse = async () => {
       try {
         const res: LlamaResponse = await llamaAPI.run(apiRequest);
+        console.log(res);
         const data = res.choices[0].message.content;
+
+        setMessageHistory([...messageHistory, data]);
         setResponse(data);
       } catch (error: any) {
         console.error(error);
-        setResponse(error.message);
+        setResponse(error);
       }
     };
 
     fetchResponse();
-  }, [ask]);
+  }, [message]);
 
   return (
     <main className={`flex flex-col justify-between ${className}`}>
@@ -57,17 +56,21 @@ export function Chat({
         <h1>ReactAI</h1>
       </header>
       <section className="main mt-3 w-full flex gap-3 flex-col overflow-y-auto">
-        {askText !== undefined && (
+        {message !== undefined && (
           <div className="right w-full flex justify-end">
             <div className="relative">
-              <p className="bg-gray-100 p-2 rounded inline-block">{askText}</p>
+              <p className="bg-gray-100 p-2 rounded inline-block">
+                {message || "Olá!"}
+              </p>
             </div>
           </div>
         )}
         {response !== "" && (
           <div className="left w-full flex justify-start">
             <div className="relative">
-              <p className="bg-blue-100 p-2 rounded inline-block max-w-96">{response}</p>
+              <p className="bg-blue-100 p-2 rounded inline-block max-w-96">
+                {response}
+              </p>
             </div>
           </div>
         )}
