@@ -9,6 +9,7 @@ export function MessageInput() {
 
   function sendMessage() {
     setMessage(inputMessage);
+    setInputMessage("");
   }
 
   return (
@@ -19,7 +20,10 @@ export function MessageInput() {
         value={inputMessage}
         onChange={(e) => setInputMessage(e.target.value)}
       ></textarea>
-      <button onClick={sendMessage} className="bg-blue-500 text-white px-4 border rounded">
+      <button
+        onClick={sendMessage}
+        className="bg-blue-500 text-white px-4 border rounded"
+      >
         Send
       </button>
     </div>

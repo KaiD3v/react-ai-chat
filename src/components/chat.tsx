@@ -1,5 +1,3 @@
-// componente responsável por processar e renderizar as respostas da API
-
 import { LlamaAI as ai } from "llamaai";
 import { apiToken } from "../utils/api-token";
 import { useContext, useEffect, useState } from "react";
@@ -17,38 +15,56 @@ interface LlamaResponse {
   choices: Choice[];
 }
 
+interface MessageHistory {
+  role: string;
+  content: string;
+}
+
 export function Chat({ className }: { className: string }) {
-  const [response, setResponse] = useState("");
-  const [messageHistory, setMessageHistory] = useState([""]);
+  const [messageHistory, setMessageHistory] = useState<MessageHistory[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [prevMessage, setPrevMessage] = useState("");
   const { message } = useContext(MessageContext);
   const llamaAPI = new ai(apiToken);
-
-  const apiRequest = {
-    messages: [
-      {
-        role: "user",
-        content: message === "" ? "Olá!" : message,
-      },
-    ],
-  };
 
   useEffect(() => {
     const fetchResponse = async () => {
       try {
+        setIsLoading(true);
+
+        const apiRequest = {
+          messages: [
+            ...messageHistory.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+            })),
+            { role: "user", content: message },
+          ],
+        };
+
         const res: LlamaResponse = await llamaAPI.run(apiRequest);
-        console.log(res);
         const data = res.choices[0].message.content;
 
-        setMessageHistory([...messageHistory, data]);
-        setResponse(data);
-      } catch (error: any) {
+        setMessageHistory((prevHistory: any) => [
+          ...prevHistory,
+          { role: "assistant", content: data },
+        ]);
+      } catch (error) {
         console.error(error);
-        setResponse(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchResponse();
-  }, [message]);
+    if (message !== "" && message !== prevMessage) {
+      setMessageHistory((prevHistory: any) => [
+        ...prevHistory,
+        { role: "user", content: message },
+      ]);
+      setPrevMessage(message); 
+      fetchResponse();
+    }
+  }, [message, messageHistory, prevMessage]);
 
   return (
     <main className={`flex flex-col justify-between ${className}`}>
@@ -56,20 +72,30 @@ export function Chat({ className }: { className: string }) {
         <h1>ReactAI</h1>
       </header>
       <section className="main mt-3 w-full flex gap-3 flex-col overflow-y-auto">
-        {message !== undefined && (
-          <div className="right w-full flex justify-end">
+        {messageHistory.map((msg, index) => (
+          <div
+            key={index}
+            className={`w-full flex ${
+              msg.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             <div className="relative">
-              <p className="bg-gray-100 p-2 rounded inline-block">
-                {message || "Olá!"}
+              <p
+                className={`${
+                  msg.role === "user" ? "bg-gray-100" : "bg-blue-100"
+                } p-2 rounded inline-block max-w-96`}
+              >
+                {msg.content}
               </p>
             </div>
           </div>
-        )}
-        {response !== "" && (
+        ))}
+
+        {isLoading && (
           <div className="left w-full flex justify-start">
             <div className="relative">
               <p className="bg-blue-100 p-2 rounded inline-block max-w-96">
-                {response}
+                Carregando...
               </p>
             </div>
           </div>
