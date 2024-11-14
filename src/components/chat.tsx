@@ -1,4 +1,4 @@
-import * as ai  from "llamaai";
+import ai  from "llamaai";
 import { apiToken } from "../utils/api-token";
 import { useContext, useEffect, useState } from "react";
 import { MessageContext } from "../services/message-context";
