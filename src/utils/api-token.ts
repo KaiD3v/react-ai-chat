@@ -1,0 +1,1 @@
+export const apiToken = import.meta.env.VITE_API_TOKEN as string;

@@ -1,4 +1,7 @@
+// responsável por enviar respostar para a api
+
 export function MessageInput() {
+  
   return (
     <div className="flex gap-3 mb-10">
       <textarea
